@@ -1,572 +1,552 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="ja">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2685.4">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 17.0px 'Helvetica Neue'; color: #181818; -webkit-text-stroke: #181818}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 17.0px 'Helvetica Neue'; color: #181818; -webkit-text-stroke: #181818; min-height: 20.0px}
-    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Hiragino Kaku Gothic ProN'; color: #181818; -webkit-text-stroke: #181818; min-height: 18.0px}
-    p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px 'Hiragino Kaku Gothic ProN'; color: #181818; -webkit-text-stroke: #181818; background-color: #ffffff; background-color: rgba(255, 255, 255, 0.34); min-height: 18.0px}
-    span.s1 {font-kerning: none; background-color: #efecec}
-    span.s2 {font-kerning: none}
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bigband Jazz Drummer's Etude</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
+<!-- Tone.js & VexFlow -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
 </head>
-<body>
-<p class="p1"><span class="s1">&lt;!DOCTYPE html&gt;</span></p>
-<p class="p1"><span class="s1">&lt;html lang="ja"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;head&gt;</span></p>
-<p class="p1"><span class="s1">&lt;meta charset="UTF-8"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;title&gt;Jazz Drummer's Etude&lt;/title&gt;</span></p>
-<p class="p1"><span class="s1">&lt;script src="https://cdn.tailwindcss.com"&gt;&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin&gt;&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin&gt;&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;script src="https://unpkg.com/@babel/standalone/babel.min.js"&gt;&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"&gt;&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;!-- Tone.js &amp; VexFlow --&gt;</span></p>
-<p class="p1"><span class="s1">&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"&gt;&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"&gt;&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/head&gt;</span></p>
-<p class="p1"><span class="s1">&lt;body class="bg-stone-100 text-stone-800 font-sans min-h-screen"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div id="root"&gt;&lt;/div&gt;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">&lt;script type="text/babel"&gt;</span></p>
-<p class="p1"><span class="s1">const { useState, useEffect, useRef, useCallback } = React;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">// --- Lucide Icons ---</span></p>
-<p class="p1"><span class="s1">const Play = ({ size = 24, className = "" }) =&gt; &lt;i data-lucide="play" width={size} height={size} className={className}&gt;&lt;/i&gt;;</span></p>
-<p class="p1"><span class="s1">const Square = ({ size = 24, className = "" }) =&gt; &lt;i data-lucide="square" width={size} height={size} className={className}&gt;&lt;/i&gt;;</span></p>
-<p class="p1"><span class="s1">const RefreshCw = ({ size = 24, className = "" }) =&gt; &lt;i data-lucide="refresh-cw" width={size} height={size} className={className}&gt;&lt;/i&gt;;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">// --- Main App Component ---</span></p>
-<p class="p1"><span class="s1">function App() {</span></p>
-<p class="p1"><span class="s1">const [isLoaded, setIsLoaded] = useState(false);</span></p>
-<p class="p1"><span class="s1">const [bpm, setBpm] = useState(120);</span></p>
-<p class="p1"><span class="s1">const [mode, setMode] = useState("Basic"); // "Hits", "Basic", "Advanced"</span></p>
-<p class="p1"><span class="s1">const [metronome, setMetronome] = useState(true);</span></p>
-<p class="p1"><span class="s1">const [loop, setLoop] = useState(true); // ループのデフォルトをONに</span></p>
-<p class="p1"><span class="s1">const [isPlaying, setIsPlaying] = useState(false);</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">const [baseSequence, setBaseSequence] = useState([]);</span></p>
-<p class="p1"><span class="s1">const [sequence, setSequence] = useState([]);</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">const containerRef = useRef(null);</span></p>
-<p class="p1"><span class="s1">const synthsRef = useRef(null);</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">useEffect(() =&gt; {</span></p>
-<p class="p1"><span class="s1">if (window.lucide) {</span></p>
-<p class="p1"><span class="s1">window.lucide.createIcons();</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">});</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">useEffect(() =&gt; {</span></p>
-<p class="p1"><span class="s1">let checkInterval = setInterval(() =&gt; {</span></p>
-<p class="p1"><span class="s1">if (window.Tone &amp;&amp; window.Vex) {</span></p>
-<p class="p1"><span class="s1">clearInterval(checkInterval);</span></p>
-<p class="p1"><span class="s1">setIsLoaded(true);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">}, 100);</span></p>
-<p class="p1"><span class="s1">return () =&gt; clearInterval(checkInterval);</span></p>
-<p class="p1"><span class="s1">}, []);</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">// ベース生成 (Long/Short の概念を追加)</span></p>
-<p class="p1"><span class="s1">const generateBaseSequence = useCallback(() =&gt; {</span></p>
-<p class="p1"><span class="s1">let newSeq = new Array(32).fill("TIME");</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">let numHits = Math.floor(Math.random() * 3) + 4; // 4 to 6 hits</span></p>
-<p class="p1"><span class="s1">let hitPositions = [];</span></p>
-<p class="p1"><span class="s1">for (let i = 0; i &lt; numHits; i++) {</span></p>
-<p class="p1"><span class="s1">let pos;</span></p>
-<p class="p1"><span class="s1">let attempts = 0;</span></p>
-<p class="p1"><span class="s1">do {</span></p>
-<p class="p1"><span class="s1">pos = Math.floor(Math.random() * 30) + 2;</span></p>
-<p class="p1"><span class="s1">attempts++;</span></p>
-<p class="p1"><span class="s1">} while (</span></p>
-<p class="p1"><span class="s1">attempts &lt; 50 &amp;&amp;</span></p>
-<p class="p1"><span class="s1">hitPositions.some(p =&gt; Math.abs(p - pos) &lt; 4)</span></p>
-<p class="p1"><span class="s1">);</span></p>
-<p class="p1"><span class="s1">if (attempts &lt; 50) hitPositions.push(pos);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">hitPositions.forEach(pos =&gt; {</span></p>
-<p class="p1"><span class="s1">let isUpbeat = Math.random() &lt; 0.5;</span></p>
-<p class="p1"><span class="s1">let isLong = Math.random() &lt; 0.5; // Long or Short Sound</span></p>
-<p class="p1"><span class="s1">if (isUpbeat) {</span></p>
-<p class="p1"><span class="s1">newSeq[pos] = isLong ? "HIT_UP_LONG" : "HIT_UP_SHORT";</span></p>
-<p class="p1"><span class="s1">} else {</span></p>
-<p class="p1"><span class="s1">newSeq[pos] = isLong ? "HIT_DOWN_LONG" : "HIT_DOWN_SHORT";</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">});</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">setBaseSequence(newSeq);</span></p>
-<p class="p1"><span class="s1">}, []);</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">// フィルイン適用</span></p>
-<p class="p1"><span class="s1">useEffect(() =&gt; {</span></p>
-<p class="p1"><span class="s1">if (baseSequence.length === 0) return;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">let newSeq = [...baseSequence];</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">for (let i = 0; i &lt; 32; i++) {</span></p>
-<p class="p1"><span class="s1">let hitType = baseSequence[i];</span></p>
-<p class="p1"><span class="s1">if (hitType.startsWith("HIT_DOWN") || hitType.startsWith("HIT_UP")) {</span></p>
-<p class="p1"><span class="s1">let fillLen = 0;</span></p>
-<p class="p1"><span class="s1">if (mode === "Hits") {</span></p>
-<p class="p1"><span class="s1">fillLen = 0;</span></p>
-<p class="p1"><span class="s1">} else if (mode === "Basic") {</span></p>
-<p class="p1"><span class="s1">fillLen = hitType.startsWith("HIT_DOWN") ? 2 : (Math.random() &lt; 0.5 ? 1 : 2);</span></p>
-<p class="p1"><span class="s1">} else {</span></p>
-<p class="p1"><span class="s1">fillLen = Math.floor(Math.random() * 2) + 3;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">for (let j = 1; j &lt;= fillLen; j++) {</span></p>
-<p class="p1"><span class="s1">let pos = i - j;</span></p>
-<p class="p1"><span class="s1">if (pos &gt;= 0 &amp;&amp; baseSequence[pos] === "TIME") {</span></p>
-<p class="p1"><span class="s1">let fills = ["FILL_88_S", "FILL_88_T", "FILL_88_K", "FILL_3_S", "FILL_3_T"];</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">if (j === 1 &amp;&amp; hitType.startsWith("HIT_DOWN")) fills.push("SETUP_4");</span></p>
-<p class="p1"><span class="s1">if (j === 1 &amp;&amp; hitType.startsWith("HIT_UP")) fills.push("SETUP_8R8");</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">newSeq[pos] = fills[Math.floor(Math.random() * fills.length)];</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">setSequence(newSeq);</span></p>
-<p class="p1"><span class="s1">}, [baseSequence, mode]);</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">useEffect(() =&gt; {</span></p>
-<p class="p1"><span class="s1">if (isLoaded) {</span></p>
-<p class="p1"><span class="s1">generateBaseSequence();</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">}, [isLoaded, generateBaseSequence]);</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">useEffect(() =&gt; {</span></p>
-<p class="p1"><span class="s1">if (window.Tone &amp;&amp; isPlaying) {</span></p>
-<p class="p1"><span class="s1">Tone.Transport.bpm.value = bpm;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">}, [bpm, isPlaying]);</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">// 再生中のループ状態の切り替えを反映</span></p>
-<p class="p1"><span class="s1">useEffect(() =&gt; {</span></p>
-<p class="p1"><span class="s1">if (window.Tone) {</span></p>
-<p class="p1"><span class="s1">Tone.Transport.loop = loop;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">}, [loop]);</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">// 描画エンジン</span></p>
-<p class="p1"><span class="s1">const drawScore = useCallback(() =&gt; {</span></p>
-<p class="p1"><span class="s1">if (!containerRef.current || !window.Vex || sequence.length === 0) return;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">containerRef.current.innerHTML = "";</span></p>
-<p class="p1"><span class="s1">const VF = window.Vex.Flow;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">// コンテナの幅を取得（スマホの場合はパディングを考慮して少し小さめに）</span></p>
-<p class="p1"><span class="s1">const containerWidth = containerRef.current.clientWidth || 800;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">// スマホ対応: 画面幅が小さい(600px未満)場合は1段2小節、それ以外は1段4小節にする</span></p>
-<p class="p1"><span class="s1">const measuresPerRow = containerWidth &lt; 600 ? 2 : 4;</span></p>
-<p class="p1"><span class="s1">const numRows = Math.ceil(8 / measuresPerRow);</span></p>
-<p class="p1"><span class="s1">const measureWidth = (containerWidth - 20) / measuresPerRow;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">const renderer = new VF.Renderer(containerRef.current, VF.Renderer.Backends.SVG);</span></p>
-<p class="p1"><span class="s1">renderer.resize(containerWidth, 40 + numRows * 120);</span></p>
-<p class="p1"><span class="s1">const context = renderer.getContext();</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">let measures = [];</span></p>
-<p class="p1"><span class="s1">for(let m = 0; m &lt; 8; m++){</span></p>
-<p class="p1"><span class="s1">measures.push(sequence.slice(m * 4, m * 4 + 4));</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">const colorGray = "#a8a29e"; // Tailwind stone-400</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">for (let i = 0; i &lt; 8; i++) {</span></p>
-<p class="p1"><span class="s1">const row = Math.floor(i / measuresPerRow);</span></p>
-<p class="p1"><span class="s1">const col = i % measuresPerRow;</span></p>
-<p class="p1"><span class="s1">const x = 10 + col * measureWidth;</span></p>
-<p class="p1"><span class="s1">const y = 40 + row * 120;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">const stave = new VF.Stave(x, y, measureWidth);</span></p>
-<p class="p1"><span class="s1">if (col === 0) stave.addClef("percussion").addTimeSignature("4/4");</span></p>
-<p class="p1"><span class="s1">stave.setContext(context).draw();</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">let notes = [];</span></p>
-<p class="p1"><span class="s1">let beams = [];</span></p>
-<p class="p1"><span class="s1">let tuplets = [];</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">measures[i].forEach(pattern =&gt; {</span></p>
-<p class="p1"><span class="s1">let beatNotes = [];</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">if (pattern === "TIME") {</span></p>
-<p class="p1"><span class="s1">const note = new VF.StaveNote({ keys: ["b/4"], duration: "4s", stem_direction: 1 });</span></p>
-<p class="p1"><span class="s1">note.setStyle({ fillStyle: colorGray, strokeStyle: colorGray });</span></p>
-<p class="p1"><span class="s1">beatNotes.push(note);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">else if (pattern.startsWith("HIT_DOWN")) {</span></p>
-<p class="p1"><span class="s1">const note = new VF.StaveNote({ keys: ["g/5"], duration: "4", stem_direction: 1 });</span></p>
-<p class="p1"><span class="s1">const isLong = pattern.includes("LONG");</span></p>
-<p class="p1"><span class="s1">note.addModifier(new VF.Articulation(isLong ? "a^" : "a&gt;").setPosition(3));</span></p>
-<p class="p1"><span class="s1">beatNotes.push(note);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">else if (pattern.startsWith("HIT_UP")) {</span></p>
-<p class="p1"><span class="s1">const rest = new VF.StaveNote({ keys: ["b/4"], duration: "8r" });</span></p>
-<p class="p1"><span class="s1">const note = new VF.StaveNote({ keys: ["g/5"], duration: "8", stem_direction: 1 });</span></p>
-<p class="p1"><span class="s1">const isLong = pattern.includes("LONG");</span></p>
-<p class="p1"><span class="s1">note.addModifier(new VF.Articulation(isLong ? "a^" : "a&gt;").setPosition(3));</span></p>
-<p class="p1"><span class="s1">beatNotes.push(rest, note);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">else if (pattern === "SETUP_4") {</span></p>
-<p class="p1"><span class="s1">beatNotes.push(new VF.StaveNote({ keys: ["c/5"], duration: "4", stem_direction: 1 }));</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">else if (pattern === "SETUP_8R8") {</span></p>
-<p class="p1"><span class="s1">beatNotes.push(</span></p>
-<p class="p1"><span class="s1">new VF.StaveNote({ keys: ["b/4"], duration: "8r" }),</span></p>
-<p class="p1"><span class="s1">new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 })</span></p>
-<p class="p1"><span class="s1">);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">else if (pattern === "FILL_88_S") {</span></p>
-<p class="p1"><span class="s1">let n1 = new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 });</span></p>
-<p class="p1"><span class="s1">let n2 = new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 });</span></p>
-<p class="p1"><span class="s1">beatNotes.push(n1, n2);</span></p>
-<p class="p1"><span class="s1">beams.push(new VF.Beam([n1, n2]));</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">else if (pattern === "FILL_88_T") {</span></p>
-<p class="p1"><span class="s1">let n1 = new VF.StaveNote({ keys: ["e/5"], duration: "8", stem_direction: 1 });</span></p>
-<p class="p1"><span class="s1">let n2 = new VF.StaveNote({ keys: ["a/4"], duration: "8", stem_direction: 1 });</span></p>
-<p class="p1"><span class="s1">beatNotes.push(n1, n2);</span></p>
-<p class="p1"><span class="s1">beams.push(new VF.Beam([n1, n2]));</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">else if (pattern === "FILL_88_K") {</span></p>
-<p class="p1"><span class="s1">let n1 = new VF.StaveNote({ keys: ["f/4"], duration: "8", stem_direction: 1 });</span></p>
-<p class="p1"><span class="s1">let n2 = new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 });</span></p>
-<p class="p1"><span class="s1">beatNotes.push(n1, n2);</span></p>
-<p class="p1"><span class="s1">beams.push(new VF.Beam([n1, n2]));</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">else if (pattern === "FILL_3_S") {</span></p>
-<p class="p1"><span class="s1">let tNotes = [</span></p>
-<p class="p1"><span class="s1">new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }),</span></p>
-<p class="p1"><span class="s1">new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }),</span></p>
-<p class="p1"><span class="s1">new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 })</span></p>
-<p class="p1"><span class="s1">];</span></p>
-<p class="p1"><span class="s1">beatNotes.push(...tNotes);</span></p>
-<p class="p1"><span class="s1">beams.push(new VF.Beam(tNotes));</span></p>
-<p class="p1"><span class="s1">tuplets.push(new VF.Tuplet(tNotes, { num_notes: 3, notes_occupied: 2 }));</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">else if (pattern === "FILL_3_T") {</span></p>
-<p class="p1"><span class="s1">let tNotes = [</span></p>
-<p class="p1"><span class="s1">new VF.StaveNote({ keys: ["e/5"], duration: "8", stem_direction: 1 }),</span></p>
-<p class="p1"><span class="s1">new VF.StaveNote({ keys: ["d/5"], duration: "8", stem_direction: 1 }),</span></p>
-<p class="p1"><span class="s1">new VF.StaveNote({ keys: ["a/4"], duration: "8", stem_direction: 1 })</span></p>
-<p class="p1"><span class="s1">];</span></p>
-<p class="p1"><span class="s1">beatNotes.push(...tNotes);</span></p>
-<p class="p1"><span class="s1">beams.push(new VF.Beam(tNotes));</span></p>
-<p class="p1"><span class="s1">tuplets.push(new VF.Tuplet(tNotes, { num_notes: 3, notes_occupied: 2 }));</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">else if (pattern === "REST_4") {</span></p>
-<p class="p1"><span class="s1">beatNotes.push(new VF.StaveNote({ keys: ["b/4"], duration: "4r" }));</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">notes.push(...beatNotes);</span></p>
-<p class="p1"><span class="s1">});</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">if (notes.length === 0) {</span></p>
-<p class="p1"><span class="s1">notes.push(new VF.StaveNote({ keys: ["b/4"], duration: "1r" }));</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">const voice = new VF.Voice({ num_beats: 4, beat_value: 4 });</span></p>
-<p class="p1"><span class="s1">voice.addTickables(notes);</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">new VF.Formatter().joinVoices([voice]).formatToStave([voice], stave);</span></p>
-<p class="p1"><span class="s1">voice.draw(context, stave);</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">beams.forEach(b =&gt; b.setContext(context).draw());</span></p>
-<p class="p1"><span class="s1">tuplets.forEach(t =&gt; t.setContext(context).draw());</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">context.setFont("Arial", 14, "bold italic");</span></p>
-<p class="p1"><span class="s1">context.fillText("Swing", 10, 30);</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">}, [sequence]);</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">useEffect(() =&gt; {</span></p>
-<p class="p1"><span class="s1">// 初回描画時にコンテナの幅が正しく取得できない問題（譜面切れ）への対策</span></p>
-<p class="p1"><span class="s1">let timerId = setTimeout(() =&gt; {</span></p>
-<p class="p1"><span class="s1">drawScore();</span></p>
-<p class="p1"><span class="s1">}, 100);</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">const handleResize = () =&gt; {</span></p>
-<p class="p1"><span class="s1">requestAnimationFrame(drawScore);</span></p>
-<p class="p1"><span class="s1">};</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">window.addEventListener("resize", handleResize);</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">// コンテナの親要素のサイズ変更を監視（より確実に幅の変更をキャッチする）</span></p>
-<p class="p1"><span class="s1">let observer;</span></p>
-<p class="p1"><span class="s1">if (containerRef.current &amp;&amp; containerRef.current.parentElement) {</span></p>
-<p class="p1"><span class="s1">observer = new ResizeObserver(() =&gt; {</span></p>
-<p class="p1"><span class="s1">requestAnimationFrame(drawScore);</span></p>
-<p class="p1"><span class="s1">});</span></p>
-<p class="p1"><span class="s1">observer.observe(containerRef.current.parentElement);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">return () =&gt; {</span></p>
-<p class="p1"><span class="s1">clearTimeout(timerId);</span></p>
-<p class="p1"><span class="s1">window.removeEventListener("resize", handleResize);</span></p>
-<p class="p1"><span class="s1">if (observer) observer.disconnect();</span></p>
-<p class="p1"><span class="s1">};</span></p>
-<p class="p1"><span class="s1">}, [drawScore]);</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">// 音源初期化</span></p>
-<p class="p1"><span class="s1">const initSynths = () =&gt; {</span></p>
-<p class="p1"><span class="s1">const rhodes = new Tone.PolySynth(Tone.Synth, {</span></p>
-<p class="p1"><span class="s1">oscillator: { type: "sine" },</span></p>
-<p class="p1"><span class="s1">envelope: { attack: 0.01, decay: 0.3, sustain: 0.2, release: 1 },</span></p>
-<p class="p1"><span class="s1">volume: -4</span></p>
-<p class="p1"><span class="s1">}).toDestination();</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">const kick = new Tone.MembraneSynth({ pitchDecay: 0.05, octaves: 4, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 }, volume: -2 }).toDestination();</span></p>
-<p class="p1"><span class="s1">const snare = new Tone.NoiseSynth({ noise: { type: "white" }, envelope: { attack: 0.001, decay: 0.2, sustain: 0 }, volume: -10 }).toDestination();</span></p>
-<p class="p1"><span class="s1">const snareTone = new Tone.MembraneSynth({ pitchDecay: 0.01, octaves: 2, oscillator: { type: "triangle" }, envelope: { attack: 0.001, decay: 0.1, sustain: 0 }, volume: -10 }).toDestination();</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">const tomHi = new Tone.MembraneSynth({ pitchDecay: 0.05, octaves: 4, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 }, volume: -6 }).toDestination();</span></p>
-<p class="p1"><span class="s1">const tomMid = new Tone.MembraneSynth({ pitchDecay: 0.05, octaves: 4, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.45, sustain: 0.01, release: 1.4 }, volume: -6 }).toDestination();</span></p>
-<p class="p1"><span class="s1">const tomLo = new Tone.MembraneSynth({ pitchDecay: 0.05, octaves: 4, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.5, sustain: 0.01, release: 1.4 }, volume: -6 }).toDestination();</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">const hihat = new Tone.MetalSynth({ frequency: 200, envelope: { attack: 0.001, decay: 0.1, release: 0.01 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5, volume: -18 }).toDestination();</span></p>
-<p class="p1"><span class="s1">const ride = new Tone.MetalSynth({ frequency: 300, envelope: { attack: 0.001, decay: 0.5, release: 0.1 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5, volume: -18 }).toDestination();</span></p>
-<p class="p1"><span class="s1">const crash = new Tone.MetalSynth({ frequency: 200, envelope: { attack: 0.001, decay: 1.5, release: 0.1 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5, volume: -12 }).toDestination();</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">const click = new Tone.MembraneSynth({ pitchDecay: 0.01, octaves: 1, oscillator: { type: "square" }, envelope: { attack: 0.001, decay: 0.1, sustain: 0 }, volume: -12 }).toDestination();</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">synthsRef.current = { rhodes, kick, snare, snareTone, tomHi, tomMid, tomLo, hihat, ride, crash, click };</span></p>
-<p class="p1"><span class="s1">};</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">const togglePlay = async () =&gt; {</span></p>
-<p class="p1"><span class="s1">if (isPlaying) {</span></p>
-<p class="p1"><span class="s1">Tone.Transport.stop();</span></p>
-<p class="p1"><span class="s1">Tone.Transport.cancel();</span></p>
-<p class="p1"><span class="s1">setIsPlaying(false);</span></p>
-<p class="p1"><span class="s1">return;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">await Tone.start();</span></p>
-<p class="p1"><span class="s1">if (!synthsRef.current) initSynths();</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">Tone.Transport.cancel();</span></p>
-<p class="p1"><span class="s1">Tone.Transport.bpm.value = bpm;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">// ループ設定を反映</span></p>
-<p class="p1"><span class="s1">Tone.Transport.loop = loop;</span></p>
-<p class="p1"><span class="s1">Tone.Transport.loopStart = 0;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">const { rhodes, kick, snare, snareTone, tomHi, tomMid, tomLo, hihat, ride, crash, click } = synthsRef.current;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">let timeAcc = 0;</span></p>
-<p class="p1"><span class="s1">const beatSec = 60 / bpm;</span></p>
-<p class="p1"><span class="s1">const swingDelay = beatSec * (2/3);</span></p>
-<p class="p1"><span class="s1">const tripletDelay = beatSec / 3;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">const playHit = (time, isLong) =&gt; {</span></p>
-<p class="p1"><span class="s1">if (isLong) {</span></p>
-<p class="p1"><span class="s1">crash.triggerAttackRelease("8n", time);</span></p>
-<p class="p1"><span class="s1">kick.triggerAttackRelease("C1", "8n", time);</span></p>
-<p class="p1"><span class="s1">rhodes.triggerAttackRelease(["C4", "E4", "G4", "B4"], "4n", time);</span></p>
-<p class="p1"><span class="s1">} else {</span></p>
-<p class="p1"><span class="s1">snare.triggerAttackRelease("16n", time, 1.2);</span></p>
-<p class="p1"><span class="s1">snareTone.triggerAttackRelease("G3", "16n", time, 1.2);</span></p>
-<p class="p1"><span class="s1">hihat.triggerAttackRelease("16n", time, 1.0);</span></p>
-<p class="p1"><span class="s1">rhodes.triggerAttackRelease(["C4", "E4", "G4", "B4"], "16n", time);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">};</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">sequence.forEach((pattern, index) =&gt; {</span></p>
-<p class="p1"><span class="s1">const beatTime = timeAcc;</span></p>
-<p class="p1"><span class="s1">const beatInMeasure = index % 4;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">if (metronome) {</span></p>
-<p class="p1"><span class="s1">Tone.Transport.schedule((time) =&gt; { click.triggerAttackRelease("C4", "32n", time, 0.5); }, beatTime);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">if (pattern === "TIME") {</span></p>
-<p class="p1"><span class="s1">// 音を鳴らさないため何もしない</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">else if (pattern.startsWith("HIT_DOWN")) {</span></p>
-<p class="p1"><span class="s1">Tone.Transport.schedule((time) =&gt; playHit(time, pattern.includes("LONG")), beatTime);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">else if (pattern.startsWith("HIT_UP")) {</span></p>
-<p class="p1"><span class="s1">let upTime = beatTime + swingDelay;</span></p>
-<p class="p1"><span class="s1">Tone.Transport.schedule((time) =&gt; playHit(time, pattern.includes("LONG")), upTime);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">else if (pattern === "SETUP_4") {</span></p>
-<p class="p1"><span class="s1">Tone.Transport.schedule((time) =&gt; {</span></p>
-<p class="p1"><span class="s1">snare.triggerAttackRelease("16n", time, 0.7); snareTone.triggerAttackRelease("G3", "16n", time, 0.7);</span></p>
-<p class="p1"><span class="s1">}, beatTime);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">else if (pattern === "SETUP_8R8") {</span></p>
-<p class="p1"><span class="s1">Tone.Transport.schedule((time) =&gt; {</span></p>
-<p class="p1"><span class="s1">snare.triggerAttackRelease("16n", time, 0.7); snareTone.triggerAttackRelease("G3", "16n", time, 0.7);</span></p>
-<p class="p1"><span class="s1">}, beatTime + swingDelay);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">else if (pattern === "FILL_88_S") {</span></p>
-<p class="p1"><span class="s1">Tone.Transport.schedule((time) =&gt; { snare.triggerAttackRelease("16n", time); snareTone.triggerAttackRelease("G3", "16n", time); }, beatTime);</span></p>
-<p class="p1"><span class="s1">Tone.Transport.schedule((time) =&gt; { snare.triggerAttackRelease("16n", time); snareTone.triggerAttackRelease("G3", "16n", time); }, beatTime + swingDelay);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">else if (pattern === "FILL_88_T") {</span></p>
-<p class="p1"><span class="s1">Tone.Transport.schedule((time) =&gt; { tomHi.triggerAttackRelease("C3", "16n", time); }, beatTime);</span></p>
-<p class="p1"><span class="s1">Tone.Transport.schedule((time) =&gt; { tomLo.triggerAttackRelease("G2", "16n", time); }, beatTime + swingDelay);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">else if (pattern === "FILL_88_K") {</span></p>
-<p class="p1"><span class="s1">Tone.Transport.schedule((time) =&gt; { kick.triggerAttackRelease("C1", "16n", time); }, beatTime);</span></p>
-<p class="p1"><span class="s1">Tone.Transport.schedule((time) =&gt; { snare.triggerAttackRelease("16n", time); snareTone.triggerAttackRelease("G3", "16n", time); }, beatTime + swingDelay);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">else if (pattern === "FILL_3_S") {</span></p>
-<p class="p1"><span class="s1">Tone.Transport.schedule((time) =&gt; { snare.triggerAttackRelease("16n", time); snareTone.triggerAttackRelease("G3", "16n", time); }, beatTime);</span></p>
-<p class="p1"><span class="s1">Tone.Transport.schedule((time) =&gt; { snare.triggerAttackRelease("16n", time); snareTone.triggerAttackRelease("G3", "16n", time); }, beatTime + tripletDelay);</span></p>
-<p class="p1"><span class="s1">Tone.Transport.schedule((time) =&gt; { snare.triggerAttackRelease("16n", time); snareTone.triggerAttackRelease("G3", "16n", time); }, beatTime + 2 * tripletDelay);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">else if (pattern === "FILL_3_T") {</span></p>
-<p class="p1"><span class="s1">Tone.Transport.schedule((time) =&gt; { tomHi.triggerAttackRelease("E3", "16n", time); }, beatTime);</span></p>
-<p class="p1"><span class="s1">Tone.Transport.schedule((time) =&gt; { tomMid.triggerAttackRelease("C3", "16n", time); }, beatTime + tripletDelay);</span></p>
-<p class="p1"><span class="s1">Tone.Transport.schedule((time) =&gt; { tomLo.triggerAttackRelease("A2", "16n", time); }, beatTime + 2 * tripletDelay);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">timeAcc += beatSec;</span></p>
-<p class="p1"><span class="s1">});</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">Tone.Transport.loopEnd = timeAcc;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">// ループがオフの場合のみ、曲の最後で停止させるスケジュールを組む</span></p>
-<p class="p1"><span class="s1">Tone.Transport.schedule((time) =&gt; {</span></p>
-<p class="p1"><span class="s1">if (!Tone.Transport.loop) {</span></p>
-<p class="p1"><span class="s1">Tone.Draw.schedule(() =&gt; {</span></p>
-<p class="p1"><span class="s1">Tone.Transport.stop();</span></p>
-<p class="p1"><span class="s1">setIsPlaying(false);</span></p>
-<p class="p1"><span class="s1">}, time);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p1"><span class="s1">}, timeAcc);</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">setIsPlaying(true);</span></p>
-<p class="p1"><span class="s1">Tone.Transport.start();</span></p>
-<p class="p1"><span class="s1">};</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">if (!isLoaded) {</span></p>
-<p class="p1"><span class="s1">return &lt;div className="flex items-center justify-center h-screen"&gt;&lt;p className="text-xl font-bold animate-pulse"&gt;Loading engine...&lt;/p&gt;&lt;/div&gt;;</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">return (</span></p>
-<p class="p1"><span class="s1">&lt;div className="max-w-5xl mx-auto p-4 md:p-8"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;header className="mb-8"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;h1 className="text-3xl font-bold text-stone-800 tracking-tight"&gt;Jazz Drummer's Etude&lt;/h1&gt;</span></p>
-<p class="p1"><span class="s1">&lt;p className="text-stone-500 mt-1"&gt;アンサンブルのキメ（Hits）に対するフィルインの練習用アプリケーション&lt;/p&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/header&gt;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">&lt;div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 mb-6"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 items-end"&gt;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">{/* BPM Control */}</span></p>
-<p class="p1"><span class="s1">&lt;div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;label className="block text-sm font-medium text-stone-600 mb-2"&gt;BPM: {bpm}&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1">&lt;input</span></p>
-<p class="p1"><span class="s1">type="range"</span></p>
-<p class="p1"><span class="s1">min="60" max="240" step="5"</span></p>
-<p class="p1"><span class="s1">value={bpm}</span></p>
-<p class="p1"><span class="s1">onChange={(e) =&gt; setBpm(parseInt(e.target.value))}</span></p>
-<p class="p1"><span class="s1">className="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-stone-700"</span></p>
-<p class="p1"><span class="s1">/&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">{/* Mode Selection */}</span></p>
-<p class="p1"><span class="s1">&lt;div className="lg:col-span-2"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;label className="block text-sm font-medium text-stone-600 mb-2"&gt;モード&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div className="flex bg-stone-100 rounded-lg p-1"&gt;</span></p>
-<p class="p1"><span class="s1">{["Hits", "Basic", "Advanced"].map(m =&gt; (</span></p>
-<p class="p1"><span class="s1">&lt;button</span></p>
-<p class="p1"><span class="s1">key={m}</span></p>
-<p class="p1"><span class="s1">onClick={() =&gt; { setMode(m); setIsPlaying(false); }}</span></p>
-<p class="p1"><span class="s1">className={`flex-1 py-1 px-3 rounded-md text-sm font-medium transition-colors ${mode === m ? 'bg-white shadow text-stone-800' : 'text-stone-500 hover:text-stone-700'}`}</span></p>
-<p class="p1"><span class="s1">&gt;</span></p>
-<p class="p1"><span class="s1">{m}</span></p>
-<p class="p1"><span class="s1">&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1">))}</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">{/* Toggles (Metronome &amp; Loop) */}</span></p>
-<p class="p1"><span class="s1">&lt;div className="flex flex-col space-y-4 justify-end h-full py-1"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;label className="flex items-center cursor-pointer"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;input</span></p>
-<p class="p1"><span class="s1">type="checkbox"</span></p>
-<p class="p1"><span class="s1">checked={metronome}</span></p>
-<p class="p1"><span class="s1">onChange={() =&gt; setMetronome(!metronome)}</span></p>
-<p class="p1"><span class="s1">className="sr-only peer"</span></p>
-<p class="p1"><span class="s1">/&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div className="w-11 h-6 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-stone-700 relative"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;span className="ml-3 text-sm font-medium text-stone-600"&gt;メトロノーム&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1">&lt;label className="flex items-center cursor-pointer"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;input</span></p>
-<p class="p1"><span class="s1">type="checkbox"</span></p>
-<p class="p1"><span class="s1">checked={loop}</span></p>
-<p class="p1"><span class="s1">onChange={() =&gt; setLoop(!loop)}</span></p>
-<p class="p1"><span class="s1">className="sr-only peer"</span></p>
-<p class="p1"><span class="s1">/&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div className="w-11 h-6 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-stone-700 relative"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;span className="ml-3 text-sm font-medium text-stone-600"&gt;ループ再生&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/label&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">{/* Action Buttons */}</span></p>
-<p class="p1"><span class="s1">&lt;div className="flex space-x-3"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;button</span></p>
-<p class="p1"><span class="s1">onClick={togglePlay}</span></p>
-<p class="p1"><span class="s1">className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-bold transition-colors ${isPlaying ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-stone-800 text-white hover:bg-stone-700'}`}</span></p>
-<p class="p1"><span class="s1">&gt;</span></p>
-<p class="p1"><span class="s1">{isPlaying ? &lt;&gt;&lt;Square size={18} /&gt;&lt;span&gt;停止&lt;/span&gt;&lt;/&gt; : &lt;&gt;&lt;Play size={18} /&gt;&lt;span&gt;再生&lt;/span&gt;&lt;/&gt;}</span></p>
-<p class="p1"><span class="s1">&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1">&lt;button</span></p>
-<p class="p1"><span class="s1">onClick={() =&gt; { Tone.Transport.stop(); setIsPlaying(false); generateBaseSequence(); }}</span></p>
-<p class="p1"><span class="s1">className="flex-1 flex items-center justify-center space-x-2 py-2 px-4 bg-stone-100 text-stone-600 hover:bg-stone-200 rounded-lg font-bold transition-colors border border-stone-200"</span></p>
-<p class="p1"><span class="s1">title="新しく生成"</span></p>
-<p class="p1"><span class="s1">&gt;</span></p>
-<p class="p1"><span class="s1">&lt;RefreshCw size={18} /&gt;</span></p>
-<p class="p1"><span class="s1">&lt;span&gt;New&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/button&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">{/* Score Area */}</span></p>
-<p class="p1"><span class="s1">&lt;div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-4 md:p-6 overflow-hidden"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div ref={containerRef} className="w-full"&gt;&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">&lt;footer className="mt-8 text-sm text-stone-500"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;div className="flex flex-wrap gap-4 justify-center items-center mb-4 text-xs"&gt;</span></p>
-<p class="p1"><span class="s1">&lt;span className="flex items-center gap-1"&gt;&lt;span className="font-bold text-lg"&gt;^&lt;/span&gt; Long Hit (Crash &amp; Kick)&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1">&lt;span className="flex items-center gap-1"&gt;&lt;span className="font-bold text-lg"&gt;&amp;gt;&lt;/span&gt; Short Hit (Snare Rim-shot &amp; Hi-Hat)&lt;/span&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">&lt;p className="text-center"&gt;「Hits」はキメのみ、「Basic」は1〜2拍フィル、「Advanced」は3〜4拍フィルの練習モードです。&lt;br/&gt;※スイングフィール（3連符の中抜き）で再生されます。&lt;/p&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/footer&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/div&gt;</span></p>
-<p class="p1"><span class="s1">);</span></p>
-<p class="p1"><span class="s1">}</span></p>
-<p class="p2"><span class="s2"></span><br></p>
-<p class="p1"><span class="s1">const root = ReactDOM.createRoot(document.getElementById('root'));</span></p>
-<p class="p1"><span class="s1">root.render(&lt;App /&gt;);</span></p>
-<p class="p1"><span class="s1">&lt;/script&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/body&gt;</span></p>
-<p class="p1"><span class="s1">&lt;/html&gt; </span></p>
-<p class="p3"><span class="s2"></span><br></p>
-<p class="p4"><span class="s2"></span><br></p>
-<p class="p4"><span class="s2"></span><br></p>
-<p class="p3"><span class="s2"></span><br></p>
-<p class="p3"><span class="s2"></span><br></p>
-<p class="p3"><span class="s2"></span><br></p>
-<p class="p3"><span class="s2"></span><br></p>
+<body class="bg-stone-100 text-stone-800 font-sans min-h-screen">
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+// --- Lucide Icons ---
+const Play = ({ size = 24, className = "" }) => <i data-lucide="play" width={size} height={size} className={className}></i>;
+const Square = ({ size = 24, className = "" }) => <i data-lucide="square" width={size} height={size} className={className}></i>;
+const RefreshCw = ({ size = 24, className = "" }) => <i data-lucide="refresh-cw" width={size} height={size} className={className}></i>;
+
+// --- Main App Component ---
+function App() {
+const [isLoaded, setIsLoaded] = useState(false);
+const [bpm, setBpm] = useState(120);
+const [mode, setMode] = useState("Basic"); // "Hits", "Basic", "Advanced"
+const [metronome, setMetronome] = useState(true);
+const [loop, setLoop] = useState(true); // ループのデフォルトをONに
+const [isPlaying, setIsPlaying] = useState(false);
+
+const [baseSequence, setBaseSequence] = useState([]);
+const [sequence, setSequence] = useState([]);
+
+const containerRef = useRef(null);
+const synthsRef = useRef(null);
+
+useEffect(() => {
+if (window.lucide) {
+window.lucide.createIcons();
+}
+});
+
+useEffect(() => {
+let checkInterval = setInterval(() => {
+if (window.Tone && window.Vex) {
+clearInterval(checkInterval);
+setIsLoaded(true);
+}
+}, 100);
+return () => clearInterval(checkInterval);
+}, []);
+
+// ベース生成 (Long/Short の概念を追加)
+const generateBaseSequence = useCallback(() => {
+let newSeq = new Array(32).fill("TIME");
+
+let numHits = Math.floor(Math.random() * 3) + 4; // 4 to 6 hits
+let hitPositions = [];
+for (let i = 0; i < numHits; i++) {
+let pos;
+let attempts = 0;
+do {
+pos = Math.floor(Math.random() * 30) + 2;
+attempts++;
+} while (
+attempts < 50 &&
+hitPositions.some(p => Math.abs(p - pos) < 4)
+);
+if (attempts < 50) hitPositions.push(pos);
+}
+
+hitPositions.forEach(pos => {
+let isUpbeat = Math.random() < 0.5;
+let isLong = Math.random() < 0.5; // Long or Short Sound
+if (isUpbeat) {
+newSeq[pos] = isLong ? "HIT_UP_LONG" : "HIT_UP_SHORT";
+} else {
+newSeq[pos] = isLong ? "HIT_DOWN_LONG" : "HIT_DOWN_SHORT";
+}
+});
+
+setBaseSequence(newSeq);
+}, []);
+
+// フィルイン適用
+useEffect(() => {
+if (baseSequence.length === 0) return;
+
+let newSeq = [...baseSequence];
+
+for (let i = 0; i < 32; i++) {
+let hitType = baseSequence[i];
+if (hitType.startsWith("HIT_DOWN") || hitType.startsWith("HIT_UP")) {
+let fillLen = 0;
+if (mode === "Hits") {
+fillLen = 0;
+} else if (mode === "Basic") {
+fillLen = hitType.startsWith("HIT_DOWN") ? 2 : (Math.random() < 0.5 ? 1 : 2);
+} else {
+fillLen = Math.floor(Math.random() * 2) + 3;
+}
+
+for (let j = 1; j <= fillLen; j++) {
+let pos = i - j;
+if (pos >= 0 && baseSequence[pos] === "TIME") {
+let fills = ["FILL_88_S", "FILL_88_T", "FILL_88_K", "FILL_3_S", "FILL_3_T"];
+
+if (j === 1 && hitType.startsWith("HIT_DOWN")) fills.push("SETUP_4");
+if (j === 1 && hitType.startsWith("HIT_UP")) fills.push("SETUP_8R8");
+
+newSeq[pos] = fills[Math.floor(Math.random() * fills.length)];
+}
+}
+}
+}
+setSequence(newSeq);
+}, [baseSequence, mode]);
+
+useEffect(() => {
+if (isLoaded) {
+generateBaseSequence();
+}
+}, [isLoaded, generateBaseSequence]);
+
+useEffect(() => {
+if (window.Tone && isPlaying) {
+Tone.Transport.bpm.value = bpm;
+}
+}, [bpm, isPlaying]);
+
+// 再生中のループ状態の切り替えを反映
+useEffect(() => {
+if (window.Tone) {
+Tone.Transport.loop = loop;
+}
+}, [loop]);
+
+// 描画エンジン
+const drawScore = useCallback(() => {
+if (!containerRef.current || !window.Vex || sequence.length === 0) return;
+
+containerRef.current.innerHTML = "";
+const VF = window.Vex.Flow;
+
+// コンテナの幅を取得（スマホの場合はパディングを考慮して少し小さめに）
+const containerWidth = containerRef.current.clientWidth || 800;
+
+// スマホ対応: 画面幅が小さい(600px未満)場合は1段2小節、それ以外は1段4小節にする
+const measuresPerRow = containerWidth < 600 ? 2 : 4;
+const numRows = Math.ceil(8 / measuresPerRow);
+const measureWidth = (containerWidth - 20) / measuresPerRow;
+
+const renderer = new VF.Renderer(containerRef.current, VF.Renderer.Backends.SVG);
+renderer.resize(containerWidth, 40 + numRows * 120);
+const context = renderer.getContext();
+
+let measures = [];
+for(let m = 0; m < 8; m++){
+measures.push(sequence.slice(m * 4, m * 4 + 4));
+}
+
+const colorGray = "#a8a29e"; // Tailwind stone-400
+
+for (let i = 0; i < 8; i++) {
+const row = Math.floor(i / measuresPerRow);
+const col = i % measuresPerRow;
+const x = 10 + col * measureWidth;
+const y = 40 + row * 120;
+
+const stave = new VF.Stave(x, y, measureWidth);
+if (col === 0) stave.addClef("percussion").addTimeSignature("4/4");
+stave.setContext(context).draw();
+
+let notes = [];
+let beams = [];
+let tuplets = [];
+
+measures[i].forEach(pattern => {
+let beatNotes = [];
+
+if (pattern === "TIME") {
+const note = new VF.StaveNote({ keys: ["b/4"], duration: "4s", stem_direction: 1 });
+note.setStyle({ fillStyle: colorGray, strokeStyle: colorGray });
+beatNotes.push(note);
+}
+else if (pattern.startsWith("HIT_DOWN")) {
+const note = new VF.StaveNote({ keys: ["g/5"], duration: "4", stem_direction: 1 });
+const isLong = pattern.includes("LONG");
+note.addModifier(new VF.Articulation(isLong ? "a^" : "a>").setPosition(3));
+beatNotes.push(note);
+}
+else if (pattern.startsWith("HIT_UP")) {
+const rest = new VF.StaveNote({ keys: ["b/4"], duration: "8r" });
+const note = new VF.StaveNote({ keys: ["g/5"], duration: "8", stem_direction: 1 });
+const isLong = pattern.includes("LONG");
+note.addModifier(new VF.Articulation(isLong ? "a^" : "a>").setPosition(3));
+beatNotes.push(rest, note);
+}
+else if (pattern === "SETUP_4") {
+beatNotes.push(new VF.StaveNote({ keys: ["c/5"], duration: "4", stem_direction: 1 }));
+}
+else if (pattern === "SETUP_8R8") {
+beatNotes.push(
+new VF.StaveNote({ keys: ["b/4"], duration: "8r" }),
+new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 })
+);
+}
+else if (pattern === "FILL_88_S") {
+let n1 = new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 });
+let n2 = new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 });
+beatNotes.push(n1, n2);
+beams.push(new VF.Beam([n1, n2]));
+}
+else if (pattern === "FILL_88_T") {
+let n1 = new VF.StaveNote({ keys: ["e/5"], duration: "8", stem_direction: 1 });
+let n2 = new VF.StaveNote({ keys: ["a/4"], duration: "8", stem_direction: 1 });
+beatNotes.push(n1, n2);
+beams.push(new VF.Beam([n1, n2]));
+}
+else if (pattern === "FILL_88_K") {
+let n1 = new VF.StaveNote({ keys: ["f/4"], duration: "8", stem_direction: 1 });
+let n2 = new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 });
+beatNotes.push(n1, n2);
+beams.push(new VF.Beam([n1, n2]));
+}
+else if (pattern === "FILL_3_S") {
+let tNotes = [
+new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }),
+new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }),
+new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 })
+];
+beatNotes.push(...tNotes);
+beams.push(new VF.Beam(tNotes));
+tuplets.push(new VF.Tuplet(tNotes, { num_notes: 3, notes_occupied: 2 }));
+}
+else if (pattern === "FILL_3_T") {
+let tNotes = [
+new VF.StaveNote({ keys: ["e/5"], duration: "8", stem_direction: 1 }),
+new VF.StaveNote({ keys: ["d/5"], duration: "8", stem_direction: 1 }),
+new VF.StaveNote({ keys: ["a/4"], duration: "8", stem_direction: 1 })
+];
+beatNotes.push(...tNotes);
+beams.push(new VF.Beam(tNotes));
+tuplets.push(new VF.Tuplet(tNotes, { num_notes: 3, notes_occupied: 2 }));
+}
+else if (pattern === "REST_4") {
+beatNotes.push(new VF.StaveNote({ keys: ["b/4"], duration: "4r" }));
+}
+
+notes.push(...beatNotes);
+});
+
+if (notes.length === 0) {
+notes.push(new VF.StaveNote({ keys: ["b/4"], duration: "1r" }));
+}
+
+const voice = new VF.Voice({ num_beats: 4, beat_value: 4 });
+voice.addTickables(notes);
+
+new VF.Formatter().joinVoices([voice]).formatToStave([voice], stave);
+voice.draw(context, stave);
+
+beams.forEach(b => b.setContext(context).draw());
+tuplets.forEach(t => t.setContext(context).draw());
+}
+
+context.setFont("Arial", 14, "bold italic");
+context.fillText("Swing", 10, 30);
+
+}, [sequence]);
+
+useEffect(() => {
+// 初回描画時にコンテナの幅が正しく取得できない問題（譜面切れ）への対策
+let timerId = setTimeout(() => {
+drawScore();
+}, 100);
+
+const handleResize = () => {
+requestAnimationFrame(drawScore);
+};
+
+window.addEventListener("resize", handleResize);
+
+// コンテナの親要素のサイズ変更を監視（より確実に幅の変更をキャッチする）
+let observer;
+if (containerRef.current && containerRef.current.parentElement) {
+observer = new ResizeObserver(() => {
+requestAnimationFrame(drawScore);
+});
+observer.observe(containerRef.current.parentElement);
+}
+
+return () => {
+clearTimeout(timerId);
+window.removeEventListener("resize", handleResize);
+if (observer) observer.disconnect();
+};
+}, [drawScore]);
+
+// 音源初期化
+const initSynths = () => {
+const rhodes = new Tone.PolySynth(Tone.Synth, {
+oscillator: { type: "sine" },
+envelope: { attack: 0.01, decay: 0.3, sustain: 0.2, release: 1 },
+volume: -4
+}).toDestination();
+
+const kick = new Tone.MembraneSynth({ pitchDecay: 0.05, octaves: 4, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 }, volume: -2 }).toDestination();
+const snare = new Tone.NoiseSynth({ noise: { type: "white" }, envelope: { attack: 0.001, decay: 0.2, sustain: 0 }, volume: -10 }).toDestination();
+const snareTone = new Tone.MembraneSynth({ pitchDecay: 0.01, octaves: 2, oscillator: { type: "triangle" }, envelope: { attack: 0.001, decay: 0.1, sustain: 0 }, volume: -10 }).toDestination();
+
+const tomHi = new Tone.MembraneSynth({ pitchDecay: 0.05, octaves: 4, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.4, sustain: 0.01, release: 1.4 }, volume: -6 }).toDestination();
+const tomMid = new Tone.MembraneSynth({ pitchDecay: 0.05, octaves: 4, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.45, sustain: 0.01, release: 1.4 }, volume: -6 }).toDestination();
+const tomLo = new Tone.MembraneSynth({ pitchDecay: 0.05, octaves: 4, oscillator: { type: "sine" }, envelope: { attack: 0.001, decay: 0.5, sustain: 0.01, release: 1.4 }, volume: -6 }).toDestination();
+
+const hihat = new Tone.MetalSynth({ frequency: 200, envelope: { attack: 0.001, decay: 0.1, release: 0.01 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5, volume: -18 }).toDestination();
+const ride = new Tone.MetalSynth({ frequency: 300, envelope: { attack: 0.001, decay: 0.5, release: 0.1 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5, volume: -18 }).toDestination();
+const crash = new Tone.MetalSynth({ frequency: 200, envelope: { attack: 0.001, decay: 1.5, release: 0.1 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5, volume: -12 }).toDestination();
+
+const click = new Tone.MembraneSynth({ pitchDecay: 0.01, octaves: 1, oscillator: { type: "square" }, envelope: { attack: 0.001, decay: 0.1, sustain: 0 }, volume: -12 }).toDestination();
+
+synthsRef.current = { rhodes, kick, snare, snareTone, tomHi, tomMid, tomLo, hihat, ride, crash, click };
+};
+
+const togglePlay = async () => {
+if (isPlaying) {
+Tone.Transport.stop();
+Tone.Transport.cancel();
+setIsPlaying(false);
+return;
+}
+
+await Tone.start();
+if (!synthsRef.current) initSynths();
+
+Tone.Transport.cancel();
+Tone.Transport.bpm.value = bpm;
+
+// ループ設定を反映
+Tone.Transport.loop = loop;
+Tone.Transport.loopStart = 0;
+
+const { rhodes, kick, snare, snareTone, tomHi, tomMid, tomLo, hihat, ride, crash, click } = synthsRef.current;
+
+let timeAcc = 0;
+const beatSec = 60 / bpm;
+const swingDelay = beatSec * (2/3);
+const tripletDelay = beatSec / 3;
+
+const playHit = (time, isLong) => {
+if (isLong) {
+crash.triggerAttackRelease("8n", time);
+kick.triggerAttackRelease("C1", "8n", time);
+rhodes.triggerAttackRelease(["C4", "E4", "G4", "B4"], "4n", time);
+} else {
+snare.triggerAttackRelease("16n", time, 1.2);
+snareTone.triggerAttackRelease("G3", "16n", time, 1.2);
+hihat.triggerAttackRelease("16n", time, 1.0);
+rhodes.triggerAttackRelease(["C4", "E4", "G4", "B4"], "16n", time);
+}
+};
+
+sequence.forEach((pattern, index) => {
+const beatTime = timeAcc;
+const beatInMeasure = index % 4;
+
+if (metronome) {
+Tone.Transport.schedule((time) => { click.triggerAttackRelease("C4", "32n", time, 0.5); }, beatTime);
+}
+
+if (pattern === "TIME") {
+// 音を鳴らさないため何もしない
+}
+else if (pattern.startsWith("HIT_DOWN")) {
+Tone.Transport.schedule((time) => playHit(time, pattern.includes("LONG")), beatTime);
+}
+else if (pattern.startsWith("HIT_UP")) {
+let upTime = beatTime + swingDelay;
+Tone.Transport.schedule((time) => playHit(time, pattern.includes("LONG")), upTime);
+}
+else if (pattern === "SETUP_4") {
+Tone.Transport.schedule((time) => {
+snare.triggerAttackRelease("16n", time, 0.7); snareTone.triggerAttackRelease("G3", "16n", time, 0.7);
+}, beatTime);
+}
+else if (pattern === "SETUP_8R8") {
+Tone.Transport.schedule((time) => {
+snare.triggerAttackRelease("16n", time, 0.7); snareTone.triggerAttackRelease("G3", "16n", time, 0.7);
+}, beatTime + swingDelay);
+}
+else if (pattern === "FILL_88_S") {
+Tone.Transport.schedule((time) => { snare.triggerAttackRelease("16n", time); snareTone.triggerAttackRelease("G3", "16n", time); }, beatTime);
+Tone.Transport.schedule((time) => { snare.triggerAttackRelease("16n", time); snareTone.triggerAttackRelease("G3", "16n", time); }, beatTime + swingDelay);
+}
+else if (pattern === "FILL_88_T") {
+Tone.Transport.schedule((time) => { tomHi.triggerAttackRelease("C3", "16n", time); }, beatTime);
+Tone.Transport.schedule((time) => { tomLo.triggerAttackRelease("G2", "16n", time); }, beatTime + swingDelay);
+}
+else if (pattern === "FILL_88_K") {
+Tone.Transport.schedule((time) => { kick.triggerAttackRelease("C1", "16n", time); }, beatTime);
+Tone.Transport.schedule((time) => { snare.triggerAttackRelease("16n", time); snareTone.triggerAttackRelease("G3", "16n", time); }, beatTime + swingDelay);
+}
+else if (pattern === "FILL_3_S") {
+Tone.Transport.schedule((time) => { snare.triggerAttackRelease("16n", time); snareTone.triggerAttackRelease("G3", "16n", time); }, beatTime);
+Tone.Transport.schedule((time) => { snare.triggerAttackRelease("16n", time); snareTone.triggerAttackRelease("G3", "16n", time); }, beatTime + tripletDelay);
+Tone.Transport.schedule((time) => { snare.triggerAttackRelease("16n", time); snareTone.triggerAttackRelease("G3", "16n", time); }, beatTime + 2 * tripletDelay);
+}
+else if (pattern === "FILL_3_T") {
+Tone.Transport.schedule((time) => { tomHi.triggerAttackRelease("E3", "16n", time); }, beatTime);
+Tone.Transport.schedule((time) => { tomMid.triggerAttackRelease("C3", "16n", time); }, beatTime + tripletDelay);
+Tone.Transport.schedule((time) => { tomLo.triggerAttackRelease("A2", "16n", time); }, beatTime + 2 * tripletDelay);
+}
+
+timeAcc += beatSec;
+});
+
+Tone.Transport.loopEnd = timeAcc;
+
+// ループがオフの場合のみ、曲の最後で停止させるスケジュールを組む
+Tone.Transport.schedule((time) => {
+if (!Tone.Transport.loop) {
+Tone.Draw.schedule(() => {
+Tone.Transport.stop();
+setIsPlaying(false);
+}, time);
+}
+}, timeAcc);
+
+setIsPlaying(true);
+Tone.Transport.start();
+};
+
+if (!isLoaded) {
+return <div className="flex items-center justify-center h-screen"><p className="text-xl font-bold animate-pulse">Loading engine...</p></div>;
+}
+
+return (
+<div className="max-w-5xl mx-auto p-4 md:p-8">
+<header className="mb-8">
+<h1 className="text-3xl font-bold text-stone-800 tracking-tight">Jazz Drummer's Etude</h1>
+<p className="text-stone-500 mt-1">アンサンブルのキメ（Hits）に対するフィルインの練習用アプリケーション</p>
+</header>
+
+<div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 mb-6">
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 items-end">
+
+{/* BPM Control */}
+<div>
+<label className="block text-sm font-medium text-stone-600 mb-2">BPM: {bpm}</label>
+<input
+type="range"
+min="60" max="240" step="5"
+value={bpm}
+onChange={(e) => setBpm(parseInt(e.target.value))}
+className="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer accent-stone-700"
+/>
+</div>
+
+{/* Mode Selection */}
+<div className="lg:col-span-2">
+<label className="block text-sm font-medium text-stone-600 mb-2">モード</label>
+<div className="flex bg-stone-100 rounded-lg p-1">
+{["Hits", "Basic", "Advanced"].map(m => (
+<button
+key={m}
+onClick={() => { setMode(m); setIsPlaying(false); }}
+className={`flex-1 py-1 px-3 rounded-md text-sm font-medium transition-colors ${mode === m ? 'bg-white shadow text-stone-800' : 'text-stone-500 hover:text-stone-700'}`}
+>
+{m}
+</button>
+))}
+</div>
+</div>
+
+{/* Toggles (Metronome & Loop) */}
+<div className="flex flex-col space-y-4 justify-end h-full py-1">
+<label className="flex items-center cursor-pointer">
+<input
+type="checkbox"
+checked={metronome}
+onChange={() => setMetronome(!metronome)}
+className="sr-only peer"
+/>
+<div className="w-11 h-6 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-stone-700 relative"></div>
+<span className="ml-3 text-sm font-medium text-stone-600">メトロノーム</span>
+</label>
+<label className="flex items-center cursor-pointer">
+<input
+type="checkbox"
+checked={loop}
+onChange={() => setLoop(!loop)}
+className="sr-only peer"
+/>
+<div className="w-11 h-6 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-stone-700 relative"></div>
+<span className="ml-3 text-sm font-medium text-stone-600">ループ再生</span>
+</label>
+</div>
+
+{/* Action Buttons */}
+<div className="flex space-x-3">
+<button
+onClick={togglePlay}
+className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-lg font-bold transition-colors ${isPlaying ? 'bg-red-50 text-red-600 hover:bg-red-100' : 'bg-stone-800 text-white hover:bg-stone-700'}`}
+>
+{isPlaying ? <><Square size={18} /><span>停止</span></> : <><Play size={18} /><span>再生</span></>}
+</button>
+<button
+onClick={() => { Tone.Transport.stop(); setIsPlaying(false); generateBaseSequence(); }}
+className="flex-1 flex items-center justify-center space-x-2 py-2 px-4 bg-stone-100 text-stone-600 hover:bg-stone-200 rounded-lg font-bold transition-colors border border-stone-200"
+title="新しく生成"
+>
+<RefreshCw size={18} />
+<span>New</span>
+</button>
+</div>
+
+</div>
+</div>
+
+{/* Score Area */}
+<div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-4 md:p-6 overflow-hidden">
+<div ref={containerRef} className="w-full"></div>
+</div>
+
+<footer className="mt-8 text-sm text-stone-500">
+<div className="flex flex-wrap gap-4 justify-center items-center mb-4 text-xs">
+<span className="flex items-center gap-1"><span className="font-bold text-lg">^</span> Long Hit (Crash & Kick)</span>
+<span className="flex items-center gap-1"><span className="font-bold text-lg">&gt;</span> Short Hit (Snare Rim-shot & Hi-Hat)</span>
+</div>
+<p className="text-center">「Hits」はキメのみ、「Basic」は1〜2拍フィル、「Advanced」は3〜4拍フィルの練習モードです。<br/>※スイングフィール（3連符の中抜き）で再生されます。</p>
+</footer>
+</div>
+);
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
 </body>
-</html>
+</html> 
+
+
+
+
+
+
+
