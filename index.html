@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bigband Jazz Drummer's Etude</title>
+<title>Jazz Drummer's Etude</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -35,6 +35,9 @@ const [isPlaying, setIsPlaying] = useState(false);
 
 const [baseSequence, setBaseSequence] = useState([]);
 const [sequence, setSequence] = useState([]);
+
+// リアルタイムの拍表示用ステート
+const [currentBeatDisplay, setCurrentBeatDisplay] = useState("1-1");
 
 const containerRef = useRef(null);
 const synthsRef = useRef(null);
@@ -191,7 +194,7 @@ let notes = [];
 let beams = [];
 let tuplets = [];
 
-measures[i].forEach(pattern => {
+measures[i].forEach((pattern, beatIndex) => {
 let beatNotes = [];
 
 if (pattern === "TIME") {
@@ -315,32 +318,17 @@ beams.forEach(b => b.setContext(context).draw());
 tuplets.forEach(t => t.setContext(context).draw());
 }
 
-context.setFont("Arial", 14, "bold italic");
-context.fillText("Swing", 10, 30);
-
 }, [sequence]);
 
 useEffect(() => {
-// 初回描画時にコンテナの幅が正しく取得できない問題（譜面切れ）への対策
-let timerId = setTimeout(() => {
-drawScore();
-}, 100);
-
-const handleResize = () => {
-requestAnimationFrame(drawScore);
-};
-
+let timerId = setTimeout(() => drawScore(), 100);
+const handleResize = () => requestAnimationFrame(drawScore);
 window.addEventListener("resize", handleResize);
-
-// コンテナの親要素のサイズ変更を監視（より確実に幅の変更をキャッチする）
 let observer;
 if (containerRef.current && containerRef.current.parentElement) {
-observer = new ResizeObserver(() => {
-requestAnimationFrame(drawScore);
-});
+observer = new ResizeObserver(() => requestAnimationFrame(drawScore));
 observer.observe(containerRef.current.parentElement);
 }
-
 return () => {
 clearTimeout(timerId);
 window.removeEventListener("resize", handleResize);
@@ -367,6 +355,7 @@ const hihat = new Tone.MetalSynth({ frequency: 200, envelope: { attack: 0.001, d
 const ride = new Tone.MetalSynth({ frequency: 300, envelope: { attack: 0.001, decay: 0.5, release: 0.1 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5, volume: -18 }).toDestination();
 const crash = new Tone.MetalSynth({ frequency: 200, envelope: { attack: 0.001, decay: 1.5, release: 0.1 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5, volume: -12 }).toDestination();
 
+// 普通のクリック音に戻す
 const click = new Tone.MembraneSynth({ pitchDecay: 0.01, octaves: 1, oscillator: { type: "square" }, envelope: { attack: 0.001, decay: 0.1, sustain: 0 }, volume: -12 }).toDestination();
 
 synthsRef.current = { rhodes, kick, snare, snareTone, tomHi, tomLo, hihat, ride, crash, click };
@@ -377,6 +366,7 @@ if (isPlaying) {
 Tone.Transport.stop();
 Tone.Transport.cancel();
 setIsPlaying(false);
+setCurrentBeatDisplay("1-1"); // 停止時に表示をリセット
 return;
 }
 
@@ -385,8 +375,6 @@ if (!synthsRef.current) initSynths();
 
 Tone.Transport.cancel();
 Tone.Transport.bpm.value = bpm;
-
-// ループ設定を反映
 Tone.Transport.loop = loop;
 Tone.Transport.loopStart = 0;
 
@@ -413,13 +401,23 @@ rhodes.triggerAttackRelease(["C4", "E4", "G4", "B4"], "16n", time);
 sequence.forEach((pattern, index) => {
 const beatTime = timeAcc;
 const beatInMeasure = index % 4;
+const currentMeasure = Math.floor(index / 4) + 1;
+
+// リアルタイムの拍表示を更新
+Tone.Transport.schedule((time) => {
+    Tone.Draw.schedule(() => {
+        setCurrentBeatDisplay(`${currentMeasure}-${beatInMeasure + 1}`);
+    }, time);
+}, beatTime);
 
 if (metronome) {
-Tone.Transport.schedule((time) => { click.triggerAttackRelease("C4", "32n", time, 0.5); }, beatTime);
+    Tone.Transport.schedule((time) => { 
+        click.triggerAttackRelease("C4", "32n", time, 0.5); 
+    }, beatTime);
 }
 
 if (pattern === "TIME") {
-// 音を鳴らさないため何もしない
+// 何もしない
 }
 else if (pattern.startsWith("HIT_DOWN")) {
 Tone.Transport.schedule((time) => playHit(time, pattern.includes("LONG")), beatTime);
@@ -487,12 +485,12 @@ timeAcc += beatSec;
 
 Tone.Transport.loopEnd = timeAcc;
 
-// ループがオフの場合のみ、曲の最後で停止させるスケジュールを組む
 Tone.Transport.schedule((time) => {
 if (!Tone.Transport.loop) {
 Tone.Draw.schedule(() => {
 Tone.Transport.stop();
 setIsPlaying(false);
+setCurrentBeatDisplay("1-1"); // 再生終了時にリセット
 }, time);
 }
 }, timeAcc);
@@ -507,9 +505,15 @@ return <div className="flex items-center justify-center h-screen"><p className="
 
 return (
 <div className="max-w-5xl mx-auto p-4 md:p-8">
-<header className="mb-8">
-<h1 className="text-3xl font-bold text-stone-800 tracking-tight">Bigband Jazz Drummer's Etude</h1>
+<header className="mb-8 flex justify-between items-end">
+<div>
+<h1 className="text-3xl font-bold text-stone-800 tracking-tight">Jazz Drummer's Etude</h1>
 <p className="text-stone-500 mt-1">アンサンブルのキメ（Hits）に対するフィルインの練習用アプリケーション</p>
+</div>
+{/* リアルタイム拍表示エリア */}
+<div className="bg-stone-800 text-white font-mono text-3xl font-bold px-6 py-2 rounded-xl shadow-inner min-w-[100px] text-center">
+    {currentBeatDisplay}
+</div>
 </header>
 
 <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 mb-6">
@@ -534,7 +538,7 @@ className="w-full h-2 bg-stone-200 rounded-lg appearance-none cursor-pointer acc
 {["Hits", "Basic", "Advanced"].map(m => (
 <button
 key={m}
-onClick={() => { setMode(m); setIsPlaying(false); }}
+onClick={() => { setMode(m); setIsPlaying(false); setCurrentBeatDisplay("1-1"); }}
 className={`flex-1 py-1 px-3 rounded-md text-sm font-medium transition-colors ${mode === m ? 'bg-white shadow text-stone-800' : 'text-stone-500 hover:text-stone-700'}`}
 >
 {m}
@@ -576,7 +580,7 @@ className={`flex-1 flex items-center justify-center space-x-2 py-2 px-4 rounded-
 {isPlaying ? <><Square size={18} /><span>停止</span></> : <><Play size={18} /><span>再生</span></>}
 </button>
 <button
-onClick={() => { Tone.Transport.stop(); setIsPlaying(false); generateBaseSequence(); }}
+onClick={() => { Tone.Transport.stop(); setIsPlaying(false); setCurrentBeatDisplay("1-1"); generateBaseSequence(); }}
 className="flex-1 flex items-center justify-center space-x-2 py-2 px-4 bg-stone-100 text-stone-600 hover:bg-stone-200 rounded-lg font-bold transition-colors border border-stone-200"
 title="新しく生成"
 >
