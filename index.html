@@ -9,7 +9,6 @@
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
-<!-- Tone.js & VexFlow -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vexflow@4.2.2/build/cjs/vexflow.js"></script>
 </head>
@@ -123,9 +122,7 @@ if (j === 1 && hitType.startsWith("HIT_DOWN")) {
     }
 } else {
     let fills = ["FILL_88_S", "FILL_88_T", "FILL_88_K", "FILL_3_S", "FILL_3_T"];
-
     if (j === 1 && hitType.startsWith("HIT_UP")) fills.push("SETUP_8R8");
-
     newSeq[pos] = fills[Math.floor(Math.random() * fills.length)];
 }
 }
@@ -194,7 +191,7 @@ let notes = [];
 let beams = [];
 let tuplets = [];
 
-measures[i].forEach((pattern, beatIndex) => {
+measures[i].forEach(pattern => {
 let beatNotes = [];
 
 if (pattern === "TIME") {
@@ -225,9 +222,11 @@ new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 })
 );
 }
 else if (pattern === "SETUP_KICK_4") {
+// 単体のキックは下向きでOK
 beatNotes.push(new VF.StaveNote({ keys: ["f/4"], duration: "4", stem_direction: -1 }));
 }
 else if (pattern === "SETUP_SK_88") {
+// 連桁で結ぶため、キックの棒も上向き(1)に揃える
 let n1 = new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 });
 let n2 = new VF.StaveNote({ keys: ["f/4"], duration: "8", stem_direction: 1 });
 beatNotes.push(n1, n2);
@@ -318,6 +317,8 @@ beams.forEach(b => b.setContext(context).draw());
 tuplets.forEach(t => t.setContext(context).draw());
 }
 
+// テキスト削除済
+
 }, [sequence]);
 
 useEffect(() => {
@@ -355,7 +356,7 @@ const hihat = new Tone.MetalSynth({ frequency: 200, envelope: { attack: 0.001, d
 const ride = new Tone.MetalSynth({ frequency: 300, envelope: { attack: 0.001, decay: 0.5, release: 0.1 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5, volume: -18 }).toDestination();
 const crash = new Tone.MetalSynth({ frequency: 200, envelope: { attack: 0.001, decay: 1.5, release: 0.1 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5, volume: -12 }).toDestination();
 
-// 普通のクリック音に戻す
+// 普通のクリック音
 const click = new Tone.MembraneSynth({ pitchDecay: 0.01, octaves: 1, oscillator: { type: "square" }, envelope: { attack: 0.001, decay: 0.1, sustain: 0 }, volume: -12 }).toDestination();
 
 synthsRef.current = { rhodes, kick, snare, snareTone, tomHi, tomLo, hihat, ride, crash, click };
@@ -510,10 +511,6 @@ return (
 <h1 className="text-3xl font-bold text-stone-800 tracking-tight">Bigband Jazz Drummer's Etude</h1>
 <p className="text-stone-500 mt-1">アンサンブルのキメ（Hits）に対するフィルインの練習用アプリケーション</p>
 </div>
-{/* リアルタイム拍表示エリア */}
-<div className="bg-stone-800 text-white font-mono text-3xl font-bold px-6 py-2 rounded-xl shadow-inner min-w-[100px] text-center">
-    {currentBeatDisplay}
-</div>
 </header>
 
 <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-6 mb-6">
@@ -593,8 +590,12 @@ title="新しく生成"
 </div>
 
 {/* Score Area */}
-<div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-4 md:p-6 overflow-hidden">
-<div ref={containerRef} className="w-full"></div>
+<div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-4 md:p-6 overflow-hidden relative">
+{/* 楽譜に重なるように右上に配置 */}
+<div className="absolute top-4 right-6 bg-stone-800 text-white font-mono text-2xl font-bold px-4 py-2 rounded-lg shadow-md z-10 opacity-90 border-2 border-stone-600 tracking-widest">
+    {currentBeatDisplay}
+</div>
+<div ref={containerRef} className="w-full mt-4"></div>
 </div>
 
 <footer className="mt-8 text-sm text-stone-500">
