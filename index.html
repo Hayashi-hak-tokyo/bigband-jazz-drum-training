@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Bigband Jazz Drummer's Etude</title>
+<title>Jazz Drummer's Etude</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
 <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
@@ -27,15 +27,15 @@ const RefreshCw = ({ size = 24, className = "" }) => <i data-lucide="refresh-cw"
 function App() {
 const [isLoaded, setIsLoaded] = useState(false);
 const [bpm, setBpm] = useState(120);
-const [mode, setMode] = useState("Basic"); // "Hits", "Basic", "Advanced"
+const [mode, setMode] = useState("Hits");
 const [metronome, setMetronome] = useState(true);
-const [loop, setLoop] = useState(true); // ループのデフォルトをONに
+const [loop, setLoop] = useState(true);
+const [showSticking, setShowSticking] = useState(false); // 手順表示のデフォルトはオフ
 const [isPlaying, setIsPlaying] = useState(false);
 
 const [baseSequence, setBaseSequence] = useState([]);
 const [sequence, setSequence] = useState([]);
 
-// リアルタイムの拍表示用ステート
 const [currentBeatDisplay, setCurrentBeatDisplay] = useState("1-1");
 
 const containerRef = useRef(null);
@@ -57,11 +57,11 @@ setIsLoaded(true);
 return () => clearInterval(checkInterval);
 }, []);
 
-// ベース生成 (Long/Short の概念を追加)
+// ベース生成
 const generateBaseSequence = useCallback(() => {
 let newSeq = new Array(32).fill("TIME");
 
-let numHits = Math.floor(Math.random() * 3) + 4; // 4 to 6 hits
+let numHits = Math.floor(Math.random() * 3) + 4;
 let hitPositions = [];
 for (let i = 0; i < numHits; i++) {
 let pos;
@@ -78,12 +78,10 @@ if (attempts < 50) hitPositions.push(pos);
 
 hitPositions.forEach(pos => {
 let isUpbeat = Math.random() < 0.5;
-let isLong = Math.random() < 0.5; // Long or Short Sound
-if (isUpbeat) {
-newSeq[pos] = isLong ? "HIT_UP_LONG" : "HIT_UP_SHORT";
-} else {
-newSeq[pos] = isLong ? "HIT_DOWN_LONG" : "HIT_DOWN_SHORT";
-}
+let isLong = Math.random() < 0.5;
+// ロングのアクセントは原則右手(R)、ショートはランダム(R or L)とする
+let hand = isLong ? "R" : (Math.random() < 0.5 ? "R" : "L"); 
+newSeq[pos] = (isUpbeat ? (isLong ? "HIT_UP_LONG_" : "HIT_UP_SHORT_") : (isLong ? "HIT_DOWN_LONG_" : "HIT_DOWN_SHORT_")) + hand;
 });
 
 setBaseSequence(newSeq);
@@ -99,19 +97,14 @@ for (let i = 0; i < 32; i++) {
 let hitType = baseSequence[i];
 if (hitType.startsWith("HIT_DOWN") || hitType.startsWith("HIT_UP")) {
 let fillLen = 0;
-if (mode === "Hits") {
-fillLen = 0;
-} else if (mode === "Basic") {
-fillLen = hitType.startsWith("HIT_DOWN") ? 2 : (Math.random() < 0.5 ? 1 : 2);
-} else {
-fillLen = Math.floor(Math.random() * 2) + 3;
-}
+if (mode === "Hits") fillLen = 0;
+else if (mode === "Basic") fillLen = hitType.startsWith("HIT_DOWN") ? 2 : (Math.random() < 0.5 ? 1 : 2);
+else fillLen = Math.floor(Math.random() * 2) + 3;
 
 for (let j = 1; j <= fillLen; j++) {
 let pos = i - j;
 if (pos >= 0 && baseSequence[pos] === "TIME") {
 if (j === 1 && hitType.startsWith("HIT_DOWN")) {
-    // ダウンビートの直前は最後の音符がキック（4分60%, 8分30%, 3連符10%）
     let r = Math.random();
     if (r < 0.6) {
         newSeq[pos] = "SETUP_KICK_4";
@@ -122,13 +115,54 @@ if (j === 1 && hitType.startsWith("HIT_DOWN")) {
     }
 } else {
     let fills = ["FILL_88_S", "FILL_88_T", "FILL_88_K", "FILL_3_S", "FILL_3_T"];
-    if (j === 1 && hitType.startsWith("HIT_UP")) fills.push("SETUP_8R8");
+
+    // 8分ウラへのセットアップは左手(L)で入れて右のアクセントに繋ぐ
+    if (j === 1 && hitType.startsWith("HIT_UP")) fills.push("SETUP_8R8_L");
+
     newSeq[pos] = fills[Math.floor(Math.random() * fills.length)];
 }
 }
 }
 }
 }
+
+// 3連符が2個続いた場合に6連符（手順バリエーション）に置き換え
+for (let i = 0; i < 31; i++) {
+if (newSeq[i] && newSeq[i].startsWith("FILL_3_") && newSeq[i+1] && newSeq[i+1].startsWith("FILL_3_")) {
+    const variants = ["RLRLRL", "RLRLLR", "RLLRLL", "RLLRRL", "RLRRLL", "RLRRLK"];
+    const v = variants[Math.floor(Math.random() * variants.length)];
+    const isOrch = Math.random() < 0.5 ? "O" : "S";
+    newSeq[i] = `FILL_6_${v}_1_${isOrch}`;
+    newSeq[i+1] = `FILL_6_${v}_2_${isOrch}`;
+    i++; // 次の拍はスキップ
+}
+}
+
+// フィルインの最後の手順に合わせてアクセントの手順を調整（左手の必然性）
+for (let i = 0; i < 32; i++) {
+if (newSeq[i] && newSeq[i].startsWith("HIT_")) {
+    let isLong = newSeq[i].includes("_LONG_");
+    
+    // 直前の拍（フィルイン）を確認
+    let prevFill = i > 0 ? newSeq[i-1] : null;
+    let needsLeftHand = false;
+    
+    if (prevFill) {
+        // RLRで終わる3連符、または RLRLLRで終わる6連符の後は必然的に左手(L)のアクセントになる
+        if (prevFill === "FILL_3_S" || prevFill === "FILL_3_T") {
+            needsLeftHand = true; 
+        } else if (prevFill.startsWith("FILL_6_RLRLLR_2_")) {
+            needsLeftHand = true;
+        }
+    }
+    
+    // 必然性がある場合かつショートアクセントの場合のみ、左手(L)に上書きする
+    if (needsLeftHand && !isLong) {
+        newSeq[i] = newSeq[i].replace(/_[RL]$/, "_L");
+    }
+}
+}
+
 setSequence(newSeq);
 }, [baseSequence, mode]);
 
@@ -144,7 +178,6 @@ Tone.Transport.bpm.value = bpm;
 }
 }, [bpm, isPlaying]);
 
-// 再生中のループ状態の切り替えを反映
 useEffect(() => {
 if (window.Tone) {
 Tone.Transport.loop = loop;
@@ -158,10 +191,7 @@ if (!containerRef.current || !window.Vex || sequence.length === 0) return;
 containerRef.current.innerHTML = "";
 const VF = window.Vex.Flow;
 
-// コンテナの幅を取得（スマホの場合はパディングを考慮して少し小さめに）
 const containerWidth = containerRef.current.clientWidth || 800;
-
-// スマホ対応: 画面幅が小さい(600px未満)場合は1段2小節、それ以外は1段4小節にする
 const measuresPerRow = containerWidth < 600 ? 2 : 4;
 const numRows = Math.ceil(8 / measuresPerRow);
 const measureWidth = (containerWidth - 20) / measuresPerRow;
@@ -175,7 +205,16 @@ for(let m = 0; m < 8; m++){
 measures.push(sequence.slice(m * 4, m * 4 + 4));
 }
 
-const colorGray = "#a8a29e"; // Tailwind stone-400
+const colorGray = "#a8a29e";
+
+const addSticking = (note, text) => {
+    if (showSticking && text) {
+        note.addModifier(new VF.Annotation(text)
+            .setVerticalJustification(VF.Annotation.VerticalJustify.BOTTOM)
+            .setFont("Arial", 12, "bold"), 0);
+    }
+    return note;
+};
 
 for (let i = 0; i < 8; i++) {
 const row = Math.floor(i / measuresPerRow);
@@ -184,14 +223,15 @@ const x = 10 + col * measureWidth;
 const y = 40 + row * 120;
 
 const stave = new VF.Stave(x, y, measureWidth);
-if (col === 0) stave.addClef("percussion").addTimeSignature("4/4");
+// 4/4 拍子を削除し、パーカッション記号のみを描画
+if (col === 0) stave.addClef("percussion");
 stave.setContext(context).draw();
 
 let notes = [];
 let beams = [];
 let tuplets = [];
 
-measures[i].forEach(pattern => {
+measures[i].forEach((pattern, beatIndex) => {
 let beatNotes = [];
 
 if (pattern === "TIME") {
@@ -202,46 +242,44 @@ beatNotes.push(note);
 else if (pattern.startsWith("HIT_DOWN")) {
 const note = new VF.StaveNote({ keys: ["g/5"], duration: "4", stem_direction: 1 });
 const isLong = pattern.includes("LONG");
+const hand = pattern.split("_").pop();
 note.addModifier(new VF.Articulation(isLong ? "a^" : "a>").setPosition(3));
-beatNotes.push(note);
+beatNotes.push(addSticking(note, hand));
 }
 else if (pattern.startsWith("HIT_UP")) {
 const rest = new VF.StaveNote({ keys: ["b/4"], duration: "8r" });
 const note = new VF.StaveNote({ keys: ["g/5"], duration: "8", stem_direction: 1 });
 const isLong = pattern.includes("LONG");
+const hand = pattern.split("_").pop();
 note.addModifier(new VF.Articulation(isLong ? "a^" : "a>").setPosition(3));
-beatNotes.push(rest, note);
+beatNotes.push(rest, addSticking(note, hand));
 }
-else if (pattern === "SETUP_4") {
-beatNotes.push(new VF.StaveNote({ keys: ["c/5"], duration: "4", stem_direction: 1 }));
-}
-else if (pattern === "SETUP_8R8") {
+else if (pattern.startsWith("SETUP_8R8")) {
+const hand = pattern.split("_")[2] || "L";
 beatNotes.push(
 new VF.StaveNote({ keys: ["b/4"], duration: "8r" }),
-new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 })
+addSticking(new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }), hand)
 );
 }
 else if (pattern === "SETUP_KICK_4") {
-// 単体のキックは下向きでOK
 beatNotes.push(new VF.StaveNote({ keys: ["f/4"], duration: "4", stem_direction: -1 }));
 }
 else if (pattern === "SETUP_SK_88") {
-// 連桁で結ぶため、キックの棒も上向き(1)に揃える
-let n1 = new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 });
+let n1 = addSticking(new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }), "L");
 let n2 = new VF.StaveNote({ keys: ["f/4"], duration: "8", stem_direction: 1 });
 beatNotes.push(n1, n2);
 beams.push(new VF.Beam([n1, n2]));
 }
 else if (pattern === "SETUP_TK_88") {
-let n1 = new VF.StaveNote({ keys: ["a/4"], duration: "8", stem_direction: 1 });
+let n1 = addSticking(new VF.StaveNote({ keys: ["a/4"], duration: "8", stem_direction: 1 }), "R");
 let n2 = new VF.StaveNote({ keys: ["f/4"], duration: "8", stem_direction: 1 });
 beatNotes.push(n1, n2);
 beams.push(new VF.Beam([n1, n2]));
 }
 else if (pattern === "SETUP_SSK_3") {
 let tNotes = [
-new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }),
-new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }),
+addSticking(new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }), "R"),
+addSticking(new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }), "L"),
 new VF.StaveNote({ keys: ["f/4"], duration: "8", stem_direction: 1 })
 ];
 beatNotes.push(...tNotes);
@@ -250,8 +288,8 @@ tuplets.push(new VF.Tuplet(tNotes, { num_notes: 3, notes_occupied: 2 }));
 }
 else if (pattern === "SETUP_TTK_3") {
 let tNotes = [
-new VF.StaveNote({ keys: ["e/5"], duration: "8", stem_direction: 1 }),
-new VF.StaveNote({ keys: ["a/4"], duration: "8", stem_direction: 1 }),
+addSticking(new VF.StaveNote({ keys: ["a/4"], duration: "8", stem_direction: 1 }), "R"),
+addSticking(new VF.StaveNote({ keys: ["e/5"], duration: "8", stem_direction: 1 }), "L"),
 new VF.StaveNote({ keys: ["f/4"], duration: "8", stem_direction: 1 })
 ];
 beatNotes.push(...tNotes);
@@ -259,28 +297,28 @@ beams.push(new VF.Beam(tNotes));
 tuplets.push(new VF.Tuplet(tNotes, { num_notes: 3, notes_occupied: 2 }));
 }
 else if (pattern === "FILL_88_S") {
-let n1 = new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 });
-let n2 = new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 });
+let n1 = addSticking(new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }), "R");
+let n2 = addSticking(new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }), "L");
 beatNotes.push(n1, n2);
 beams.push(new VF.Beam([n1, n2]));
 }
 else if (pattern === "FILL_88_T") {
-let n1 = new VF.StaveNote({ keys: ["e/5"], duration: "8", stem_direction: 1 });
-let n2 = new VF.StaveNote({ keys: ["a/4"], duration: "8", stem_direction: 1 });
+let n1 = addSticking(new VF.StaveNote({ keys: ["a/4"], duration: "8", stem_direction: 1 }), "R");
+let n2 = addSticking(new VF.StaveNote({ keys: ["e/5"], duration: "8", stem_direction: 1 }), "L");
 beatNotes.push(n1, n2);
 beams.push(new VF.Beam([n1, n2]));
 }
 else if (pattern === "FILL_88_K") {
 let n1 = new VF.StaveNote({ keys: ["f/4"], duration: "8", stem_direction: 1 });
-let n2 = new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 });
+let n2 = addSticking(new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }), "L");
 beatNotes.push(n1, n2);
 beams.push(new VF.Beam([n1, n2]));
 }
 else if (pattern === "FILL_3_S") {
 let tNotes = [
-new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }),
-new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }),
-new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 })
+addSticking(new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }), "R"),
+addSticking(new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }), "L"),
+addSticking(new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }), "R")
 ];
 beatNotes.push(...tNotes);
 beams.push(new VF.Beam(tNotes));
@@ -288,10 +326,44 @@ tuplets.push(new VF.Tuplet(tNotes, { num_notes: 3, notes_occupied: 2 }));
 }
 else if (pattern === "FILL_3_T") {
 let tNotes = [
-new VF.StaveNote({ keys: ["e/5"], duration: "8", stem_direction: 1 }),
-new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }),
-new VF.StaveNote({ keys: ["a/4"], duration: "8", stem_direction: 1 })
+addSticking(new VF.StaveNote({ keys: ["e/5"], duration: "8", stem_direction: 1 }), "R"),
+addSticking(new VF.StaveNote({ keys: ["c/5"], duration: "8", stem_direction: 1 }), "L"),
+addSticking(new VF.StaveNote({ keys: ["a/4"], duration: "8", stem_direction: 1 }), "R")
 ];
+beatNotes.push(...tNotes);
+beams.push(new VF.Beam(tNotes));
+tuplets.push(new VF.Tuplet(tNotes, { num_notes: 3, notes_occupied: 2 }));
+}
+else if (pattern.startsWith("FILL_6_")) {
+const parts = pattern.split("_");
+const variant = parts[2];
+const half = parts[3];
+const type = parts[4];
+
+let notesArr = [];
+if (type === "S") {
+    notesArr = ["S", "S", "S", "S", "S", "S"];
+    if (variant === "RLRRLK") notesArr[5] = "K";
+} else {
+    if (variant === "RLRLRL") notesArr = ["T1", "S", "T2", "S", "T1", "S"];
+    if (variant === "RLRLLR") notesArr = ["S", "T1", "T2", "S", "S", "T1"];
+    if (variant === "RLLRLL") notesArr = ["T1", "S", "S", "T2", "S", "S"];
+    if (variant === "RLLRRL") notesArr = ["T1", "S", "S", "S", "S", "T1"];
+    if (variant === "RLRRLL") notesArr = ["S", "T1", "S", "S", "S", "S"];
+    if (variant === "RLRRLK") notesArr = ["T1", "S", "S", "S", "S", "K"];
+}
+
+const startIndex = half === "1" ? 0 : 3;
+const currentNotes = notesArr.slice(startIndex, startIndex + 3);
+const currentSticking = variant.split("").slice(startIndex, startIndex + 3);
+
+const keyMap = { "S": "c/5", "T1": "e/5", "T2": "a/4", "K": "f/4" };
+
+let tNotes = currentNotes.map((n, idx) => {
+    let sn = new VF.StaveNote({ keys: [keyMap[n]], duration: "8", stem_direction: 1 });
+    return addSticking(sn, currentSticking[idx]);
+});
+
 beatNotes.push(...tNotes);
 beams.push(new VF.Beam(tNotes));
 tuplets.push(new VF.Tuplet(tNotes, { num_notes: 3, notes_occupied: 2 }));
@@ -317,9 +389,7 @@ beams.forEach(b => b.setContext(context).draw());
 tuplets.forEach(t => t.setContext(context).draw());
 }
 
-// テキスト削除済
-
-}, [sequence]);
+}, [sequence, showSticking]);
 
 useEffect(() => {
 let timerId = setTimeout(() => drawScore(), 100);
@@ -356,7 +426,6 @@ const hihat = new Tone.MetalSynth({ frequency: 200, envelope: { attack: 0.001, d
 const ride = new Tone.MetalSynth({ frequency: 300, envelope: { attack: 0.001, decay: 0.5, release: 0.1 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5, volume: -18 }).toDestination();
 const crash = new Tone.MetalSynth({ frequency: 200, envelope: { attack: 0.001, decay: 1.5, release: 0.1 }, harmonicity: 5.1, modulationIndex: 32, resonance: 4000, octaves: 1.5, volume: -12 }).toDestination();
 
-// 普通のクリック音
 const click = new Tone.MembraneSynth({ pitchDecay: 0.01, octaves: 1, oscillator: { type: "square" }, envelope: { attack: 0.001, decay: 0.1, sustain: 0 }, volume: -12 }).toDestination();
 
 synthsRef.current = { rhodes, kick, snare, snareTone, tomHi, tomLo, hihat, ride, crash, click };
@@ -367,7 +436,7 @@ if (isPlaying) {
 Tone.Transport.stop();
 Tone.Transport.cancel();
 setIsPlaying(false);
-setCurrentBeatDisplay("1-1"); // 停止時に表示をリセット
+setCurrentBeatDisplay("1-1");
 return;
 }
 
@@ -404,17 +473,16 @@ const beatTime = timeAcc;
 const beatInMeasure = index % 4;
 const currentMeasure = Math.floor(index / 4) + 1;
 
-// リアルタイムの拍表示を更新
 Tone.Transport.schedule((time) => {
-    Tone.Draw.schedule(() => {
-        setCurrentBeatDisplay(`${currentMeasure}-${beatInMeasure + 1}`);
-    }, time);
+Tone.Draw.schedule(() => {
+setCurrentBeatDisplay(`${currentMeasure}-${beatInMeasure + 1}`);
+}, time);
 }, beatTime);
 
 if (metronome) {
-    Tone.Transport.schedule((time) => { 
-        click.triggerAttackRelease("C4", "32n", time, 0.5); 
-    }, beatTime);
+Tone.Transport.schedule((time) => {
+click.triggerAttackRelease("C4", "32n", time, 0.5);
+}, beatTime);
 }
 
 if (pattern === "TIME") {
@@ -427,12 +495,7 @@ else if (pattern.startsWith("HIT_UP")) {
 let upTime = beatTime + swingDelay;
 Tone.Transport.schedule((time) => playHit(time, pattern.includes("LONG")), upTime);
 }
-else if (pattern === "SETUP_4") {
-Tone.Transport.schedule((time) => {
-snare.triggerAttackRelease("16n", time, 0.7); snareTone.triggerAttackRelease("G3", "16n", time, 0.7);
-}, beatTime);
-}
-else if (pattern === "SETUP_8R8") {
+else if (pattern.startsWith("SETUP_8R8")) {
 Tone.Transport.schedule((time) => {
 snare.triggerAttackRelease("16n", time, 0.7); snareTone.triggerAttackRelease("G3", "16n", time, 0.7);
 }, beatTime + swingDelay);
@@ -454,8 +517,8 @@ Tone.Transport.schedule((time) => { snare.triggerAttackRelease("16n", time); sna
 Tone.Transport.schedule((time) => { kick.triggerAttackRelease("C1", "16n", time); }, beatTime + 2 * tripletDelay);
 }
 else if (pattern === "SETUP_TTK_3") {
-Tone.Transport.schedule((time) => { tomHi.triggerAttackRelease("E3", "16n", time); }, beatTime);
-Tone.Transport.schedule((time) => { tomLo.triggerAttackRelease("A2", "16n", time); }, beatTime + tripletDelay);
+Tone.Transport.schedule((time) => { tomLo.triggerAttackRelease("A2", "16n", time); }, beatTime);
+Tone.Transport.schedule((time) => { tomHi.triggerAttackRelease("E3", "16n", time); }, beatTime + tripletDelay);
 Tone.Transport.schedule((time) => { kick.triggerAttackRelease("C1", "16n", time); }, beatTime + 2 * tripletDelay);
 }
 else if (pattern === "FILL_88_S") {
@@ -463,8 +526,8 @@ Tone.Transport.schedule((time) => { snare.triggerAttackRelease("16n", time); sna
 Tone.Transport.schedule((time) => { snare.triggerAttackRelease("16n", time); snareTone.triggerAttackRelease("G3", "16n", time); }, beatTime + swingDelay);
 }
 else if (pattern === "FILL_88_T") {
-Tone.Transport.schedule((time) => { tomHi.triggerAttackRelease("C3", "16n", time); }, beatTime);
-Tone.Transport.schedule((time) => { tomLo.triggerAttackRelease("G2", "16n", time); }, beatTime + swingDelay);
+Tone.Transport.schedule((time) => { tomLo.triggerAttackRelease("A2", "16n", time); }, beatTime);
+Tone.Transport.schedule((time) => { tomHi.triggerAttackRelease("E3", "16n", time); }, beatTime + swingDelay);
 }
 else if (pattern === "FILL_88_K") {
 Tone.Transport.schedule((time) => { kick.triggerAttackRelease("C1", "16n", time); }, beatTime);
@@ -480,6 +543,37 @@ Tone.Transport.schedule((time) => { tomHi.triggerAttackRelease("E3", "16n", time
 Tone.Transport.schedule((time) => { snare.triggerAttackRelease("16n", time); snareTone.triggerAttackRelease("G3", "16n", time); }, beatTime + tripletDelay);
 Tone.Transport.schedule((time) => { tomLo.triggerAttackRelease("A2", "16n", time); }, beatTime + 2 * tripletDelay);
 }
+else if (pattern.startsWith("FILL_6_")) {
+const parts = pattern.split("_");
+const variant = parts[2];
+const half = parts[3];
+const type = parts[4];
+
+let notesArr = [];
+if (type === "S") {
+    notesArr = ["S", "S", "S", "S", "S", "S"];
+    if (variant === "RLRRLK") notesArr[5] = "K";
+} else {
+    if (variant === "RLRLRL") notesArr = ["T1", "S", "T2", "S", "T1", "S"];
+    if (variant === "RLRLLR") notesArr = ["S", "T1", "T2", "S", "S", "T1"];
+    if (variant === "RLLRLL") notesArr = ["T1", "S", "S", "T2", "S", "S"];
+    if (variant === "RLLRRL") notesArr = ["T1", "S", "S", "S", "S", "T1"];
+    if (variant === "RLRRLL") notesArr = ["S", "T1", "S", "S", "S", "S"];
+    if (variant === "RLRRLK") notesArr = ["T1", "S", "S", "S", "S", "K"];
+}
+
+const startIndex = half === "1" ? 0 : 3;
+const currentNotes = notesArr.slice(startIndex, startIndex + 3);
+
+currentNotes.forEach((n, idx) => {
+    Tone.Transport.schedule((time) => {
+        if (n === "S") { snare.triggerAttackRelease("16n", time); snareTone.triggerAttackRelease("G3", "16n", time); }
+        else if (n === "T1") { tomHi.triggerAttackRelease("E3", "16n", time); }
+        else if (n === "T2") { tomLo.triggerAttackRelease("A2", "16n", time); }
+        else if (n === "K") { kick.triggerAttackRelease("C1", "16n", time); }
+    }, beatTime + idx * tripletDelay);
+});
+}
 
 timeAcc += beatSec;
 });
@@ -491,7 +585,7 @@ if (!Tone.Transport.loop) {
 Tone.Draw.schedule(() => {
 Tone.Transport.stop();
 setIsPlaying(false);
-setCurrentBeatDisplay("1-1"); // 再生終了時にリセット
+setCurrentBeatDisplay("1-1");
 }, time);
 }
 }, timeAcc);
@@ -508,7 +602,7 @@ return (
 <div className="max-w-5xl mx-auto p-4 md:p-8">
 <header className="mb-8 flex justify-between items-end">
 <div>
-<h1 className="text-3xl font-bold text-stone-800 tracking-tight">Bigband Jazz Drummer's Etude</h1>
+<h1 className="text-3xl font-bold text-stone-800 tracking-tight">Jazz Drummer's Etude</h1>
 <p className="text-stone-500 mt-1">アンサンブルのキメ（Hits）に対するフィルインの練習用アプリケーション</p>
 </div>
 </header>
@@ -544,8 +638,8 @@ className={`flex-1 py-1 px-3 rounded-md text-sm font-medium transition-colors ${
 </div>
 </div>
 
-{/* Toggles (Metronome & Loop) */}
-<div className="flex flex-col space-y-4 justify-end h-full py-1">
+{/* Toggles (Metronome & Loop & Sticking) */}
+<div className="flex flex-col space-y-2 justify-end h-full py-1">
 <label className="flex items-center cursor-pointer">
 <input
 type="checkbox"
@@ -565,6 +659,16 @@ className="sr-only peer"
 />
 <div className="w-11 h-6 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-stone-700 relative"></div>
 <span className="ml-3 text-sm font-medium text-stone-600">ループ再生</span>
+</label>
+<label className="flex items-center cursor-pointer">
+<input
+type="checkbox"
+checked={showSticking}
+onChange={() => setShowSticking(!showSticking)}
+className="sr-only peer"
+/>
+<div className="w-11 h-6 bg-stone-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-stone-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-stone-700 relative"></div>
+<span className="ml-3 text-sm font-medium text-stone-600">手順の表示</span>
 </label>
 </div>
 
@@ -591,9 +695,8 @@ title="新しく生成"
 
 {/* Score Area */}
 <div className="bg-white rounded-2xl shadow-sm border border-stone-200 p-4 md:p-6 overflow-hidden relative">
-{/* 楽譜に重なるように右上に配置 */}
 <div className="absolute top-4 right-6 bg-stone-800 text-white font-mono text-2xl font-bold px-4 py-2 rounded-lg shadow-md z-10 opacity-90 border-2 border-stone-600 tracking-widest">
-    {currentBeatDisplay}
+{currentBeatDisplay}
 </div>
 <div ref={containerRef} className="w-full mt-4"></div>
 </div>
@@ -603,7 +706,7 @@ title="新しく生成"
 <span className="flex items-center gap-1"><span className="font-bold text-lg">^</span> Long Hit (Crash & Kick)</span>
 <span className="flex items-center gap-1"><span className="font-bold text-lg">&gt;</span> Short Hit (Snare Rim-shot & Hi-Hat)</span>
 </div>
-<p className="text-center">「Hits」はキメのみ、「Basic」は1〜2拍フィル、「Advanced」は3〜4拍フィルの練習モードです。<br/></p>
+<p className="text-center">「Hits」はキメのみ、「Basic」は1〜2拍フィル、「Advanced」は3〜4拍フィルの練習モードです。<br/>※スイングフィール（3連符の中抜き）で再生されます。</p>
 </footer>
 </div>
 );
